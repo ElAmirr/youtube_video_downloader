@@ -85,13 +85,13 @@ export const analyzeVideo = (url: string): Promise<any> => {
           const hasFfmpeg = fs.existsSync(ffmpegPath);
 
           const defaultBestFormat = hasFfmpeg
-            ? 'bestvideo+bestaudio/best'
+            ? 'bestvideo[vcodec^=avc]+bestaudio[acodec^=mp4a]/bestvideo[vcodec^=avc]+bestaudio/best[vcodec^=avc]/bestvideo+bestaudio/best'
             : 'best[ext=mp4]/best[vcodec!=none][acodec!=none]/18/22/best';
 
           const formats: FormatOption[] = [
             {
               formatId: defaultBestFormat,
-              label: 'Best Quality (Video + Audio)',
+              label: 'Best Quality (Premiere Pro Compatible)',
               ext: 'mp4',
               resolution: raw.height ? `${raw.height}p` : 'Best',
             },
@@ -112,7 +112,7 @@ export const analyzeVideo = (url: string): Promise<any> => {
                 heightsSeen.add(vf.height);
 
                 const formatString = hasFfmpeg
-                  ? `bestvideo[height<=${vf.height}]+bestaudio/best[height<=${vf.height}]`
+                  ? `bestvideo[height<=${vf.height}][vcodec^=avc]+bestaudio[acodec^=mp4a]/bestvideo[height<=${vf.height}][vcodec^=avc]+bestaudio/bestvideo[height<=${vf.height}]+bestaudio/best[height<=${vf.height}]`
                   : `best[height<=${vf.height}]/18/best`;
 
                 formats.push({
