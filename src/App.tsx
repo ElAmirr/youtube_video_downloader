@@ -27,8 +27,8 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-slate-950/80 backdrop-blur-xl h-full flex flex-col pt-10 border-r border-slate-800/60 select-none z-20">
       <div className="px-6 mb-8 flex items-center gap-3 text-xl font-bold text-white tracking-tight">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 overflow-hidden">
-          <img src="/icon.png" alt="Logo" className="w-full h-full object-cover mix-blend-screen scale-110" />
+        <div className="w-10 h-10 flex items-center justify-center">
+          <img src="/icon.png" alt="Logo" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
         </div>
         <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
           TubeFlow
