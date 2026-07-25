@@ -92,7 +92,7 @@ export const analyzeVideo = (url: string): Promise<any> => {
             {
               formatId: defaultBestFormat,
               label: 'Best Quality (Video + Audio)',
-              ext: hasFfmpeg ? 'mkv' : 'mp4',
+              ext: 'mp4',
               resolution: raw.height ? `${raw.height}p` : 'Best',
             },
           ];
@@ -118,7 +118,7 @@ export const analyzeVideo = (url: string): Promise<any> => {
                 formats.push({
                   formatId: formatString,
                   label: `${vf.height}p ${vf.height >= 720 ? 'HD' : 'SD'}`,
-                  ext: hasFfmpeg ? 'mkv' : 'mp4',
+                  ext: 'mp4',
                   resolution: `${vf.height}p`,
                 });
               }
@@ -182,7 +182,7 @@ export const startDownload = (
 
   if (fs.existsSync(ffmpegPath)) {
     args.push('--ffmpeg-location', ffmpegPath);
-    args.push('--merge-output-format', 'mkv');
+    args.push('--remux-video', 'mp4');
   }
 
   const proc = spawn(ytDlpPath, args);
