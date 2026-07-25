@@ -182,7 +182,10 @@ export const startDownload = (
 
   if (fs.existsSync(ffmpegPath)) {
     args.push('--ffmpeg-location', ffmpegPath);
-    args.push('--remux-video', 'mp4');
+    // Force transcode to H.264 + AAC — the only codecs Adobe Premiere Pro natively supports.
+    // --recode-video will re-encode if the stream is VP9/AV1, not just remux.
+    args.push('--recode-video', 'mp4');
+    args.push('--postprocessor-args', 'ffmpeg:-c:v libx264 -crf 18 -preset slow -c:a aac -b:a 320k');
   }
 
   const proc = spawn(ytDlpPath, args);
