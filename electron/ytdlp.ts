@@ -61,7 +61,7 @@ export const analyzeVideo = (url: string): Promise<any> => {
       return reject(new Error('yt-dlp executable not found. Please wait for initial setup.'));
     }
 
-    const proc = spawn(ytDlpPath, ['--dump-json', '--no-playlist', '--js-runtimes', 'nodejs', url]);
+    const proc = spawn(ytDlpPath, ['--dump-json', '--no-playlist', '--js-runtimes', 'node', url]);
 
     let output = '';
     let errorOutput = '';
@@ -173,7 +173,7 @@ export const startDownload = (
     format || 'best[ext=mp4]/best[vcodec!=none][acodec!=none]/18/best',
     '-o',
     outputTemplate,
-    '--js-runtimes', 'nodejs',
+    '--js-runtimes', 'node',
     '--newline',
     '--no-mtime',
     '--no-part',
