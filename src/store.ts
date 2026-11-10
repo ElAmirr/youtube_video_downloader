@@ -1,4 +1,8 @@
 import { create } from 'zustand';
+import type { DownloadSection } from './utils/time';
+import type { Language } from './utils/i18n';
+
+export type { DownloadSection };
 
 export interface DownloadTask {
   id: string;
@@ -13,6 +17,7 @@ export interface DownloadTask {
   format?: string;
   filePath?: string;
   errorMessage?: string;
+  section?: DownloadSection;
 }
 
 export interface HistoryTask {
@@ -25,23 +30,31 @@ export interface HistoryTask {
   channel?: string;
   format?: string;
   size?: string;
+  section?: DownloadSection;
 }
 
 export interface AppSettings {
   downloadFolder: string;
   maxConcurrentDownloads: number;
   darkTheme: boolean;
+  language?: Language;
+  isPro?: boolean;
 }
 
 interface AppState {
   settings: AppSettings;
   queue: DownloadTask[];
   history: HistoryTask[];
+  language: Language;
+  isPro: boolean;
   
   // Actions
+  setLanguage: (lang: Language) => void;
+  setIsPro: (val: boolean) => void;
   loadInitialData: () => Promise<void>;
   updateSettings: (newSettings: Partial<AppSettings>) => Promise<void>;
   addToQueue: (task: DownloadTask) => void;
+  updateQueueItem: (id: string, data: Partial<DownloadTask>) => void;
   updateProgress: (id: string, data: Partial<DownloadTask>) => void;
   markCompleted: (id: string, filePath: string, historyItem?: HistoryTask) => void;
   markError: (id: string, errorMessage: string) => void;
@@ -58,6 +71,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   queue: [],
   history: [],
+  language: 'en',
+  isPro: false,
+
+  setLanguage: (lang) => {
+    set({ language: lang });
+    get().updateSettings({ language: lang });
+  },
+
+  setIsPro: (val) => {
+    set({ isPro: val });
+    get().updateSettings({ isPro: val });
+  },
 
   loadInitialData: async () => {
     const electronAPI = (window as any).electronAPI;
@@ -69,7 +94,11 @@ export const useAppStore = create<AppState>((set, get) => ({
         ]);
 
         if (settings) {
-          set({ settings });
+          set({
+            settings,
+            language: settings.language || 'en',
+            isPro: !!settings.isPro,
+          });
         }
         if (history) {
           set({ history });
@@ -91,6 +120,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addToQueue: (task) => {
     set((state) => ({ queue: [task, ...state.queue] }));
+  },
+
+  updateQueueItem: (id, data) => {
+    set((state) => ({
+      queue: state.queue.map((task) => (task.id === id ? { ...task, ...data } : task)),
+    }));
   },
 
   updateProgress: (id, data) => {

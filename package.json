@@ -1,9 +1,9 @@
 {
-  "name": "tubeflow",
+  "name": "vidos",
   "private": true,
-  "version": "0.0.0",
-  "description": "Modern desktop video downloader powered by yt-dlp",
-  "author": "TubeFlow",
+  "version": "1.0.0",
+  "description": "vidos - Fast YouTube Video Downloader",
+  "author": "vidos",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -13,10 +13,10 @@
     "preview": "vite preview"
   },
   "build": {
-    "appId": "com.tubeflow.app",
-    "productName": "TubeFlow",
+    "appId": "com.vidos.app",
+    "productName": "vidos",
     "directories": {
-      "output": "C:\\Users\\yanju\\Desktop\\TubeFlow-release"
+      "output": "C:\\Users\\yanju\\Desktop\\vidos-release"
     },
     "files": [
       "dist/**",
@@ -24,6 +24,7 @@
     ],
     "asar": true,
     "win": {
+      "icon": "build/icon.png",
       "target": [
         "nsis"
       ]
@@ -41,6 +42,7 @@
     "framer-motion": "^12.42.2",
     "jimp": "^1.6.1",
     "lucide-react": "^1.26.0",
+    "node-machine-id": "^1.1.12",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",

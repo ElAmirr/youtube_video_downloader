@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { store } from './store.js';
+import { setupLicenseHandlers } from './license.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,7 @@ async function createWindow() {
                     : preloadMjs;
 
   const iconPath = app.isPackaged 
-    ? path.join(process.resourcesPath, 'app.asar/public/icon.png')
+    ? path.join(__dirname, '../dist/icon.png')
     : path.join(__dirname, '../public/icon.png');
 
   mainWindow = new BrowserWindow({
@@ -38,11 +39,11 @@ async function createWindow() {
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#090d16',
+      color: '#0e0e10',
       symbolColor: '#cbd5e1',
       height: 36,
     },
-    backgroundColor: '#030712',
+    backgroundColor: '#0e0e10',
     show: false,
   });
 
@@ -66,6 +67,9 @@ app.whenReady().then(async () => {
   // Initialize store
   await store.init();
 
+  // Setup license validation & background heartbeat
+  setupLicenseHandlers(() => mainWindow);
+
   // Ensure yt-dlp binary in background
   try {
     const { ensureYtDlp } = await import('./ytdlp.js');
@@ -73,6 +77,26 @@ app.whenReady().then(async () => {
   } catch (err) {
     console.warn('Failed to load ytdlp module:', err);
   }
+
+  // IPC handlers: yt-dlp Version and Updates
+  ipcMain.handle('getYtDlpVersion', async () => {
+    try {
+      const { getYtDlpVersion } = await import('./ytdlp.js');
+      const version = await getYtDlpVersion();
+      return { version };
+    } catch (err: any) {
+      return { version: 'Unknown', error: err.message };
+    }
+  });
+
+  ipcMain.handle('updateYtDlp', async () => {
+    try {
+      const { updateYtDlp } = await import('./ytdlp.js');
+      return await updateYtDlp();
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Update failed' };
+    }
+  });
 
   // IPC handlers: Analyze Video
   ipcMain.handle('analyzeVideo', async (_event, url: string) => {
@@ -96,9 +120,16 @@ app.whenReady().then(async () => {
         thumbnail: string;
         format: string;
         downloadPath?: string;
+        section?: {
+          start: string;
+          end: string;
+          startSeconds?: number;
+          endSeconds?: number;
+          label?: string;
+        };
       }
     ) => {
-      const { id, url, title, thumbnail, format } = payload;
+      const { id, url, title, thumbnail, format, section } = payload;
       const settings = store.getSettings();
       const downloadFolder = payload.downloadPath || settings.downloadFolder || app.getPath('downloads');
 
@@ -126,6 +157,7 @@ app.whenReady().then(async () => {
               filePath,
               date: new Date().toISOString(),
               format,
+              section,
             };
             await store.addHistory(historyItem);
             if (mainWindow && !mainWindow.isDestroyed()) {
@@ -138,7 +170,8 @@ app.whenReady().then(async () => {
             if (mainWindow && !mainWindow.isDestroyed()) {
               mainWindow.webContents.send('download-error', { id, error: errorMsg });
             }
-          }
+          },
+          section
         );
 
         activeDownloads.set(id, proc);

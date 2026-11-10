@@ -8,6 +8,14 @@ export interface AppSettings {
   darkTheme: boolean;
 }
 
+export interface DownloadSection {
+  start: string;
+  end: string;
+  startSeconds?: number;
+  endSeconds?: number;
+  label?: string;
+}
+
 export interface HistoryItem {
   id: string;
   title: string;
@@ -18,6 +26,7 @@ export interface HistoryItem {
   channel?: string;
   format?: string;
   size?: string;
+  section?: DownloadSection;
 }
 
 export interface QueueItem {
@@ -33,6 +42,7 @@ export interface QueueItem {
   format?: string;
   filePath?: string;
   errorMessage?: string;
+  section?: DownloadSection;
 }
 
 interface DataStore {

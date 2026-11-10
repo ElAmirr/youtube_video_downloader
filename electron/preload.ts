@@ -1,6 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  getYtDlpVersion: () => ipcRenderer.invoke('getYtDlpVersion'),
+
+  updateYtDlp: () => ipcRenderer.invoke('updateYtDlp'),
+
   analyzeVideo: (url: string) => ipcRenderer.invoke('analyzeVideo', url),
 
   startDownload: (options: {
@@ -10,6 +14,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     thumbnail: string;
     format: string;
     downloadPath?: string;
+    section?: {
+      start: string;
+      end: string;
+      startSeconds?: number;
+      endSeconds?: number;
+      label?: string;
+    };
   }) => ipcRenderer.invoke('startDownload', options),
 
   cancelDownload: (id: string) => ipcRenderer.invoke('cancelDownload', id),
@@ -50,5 +61,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('download-progress');
     ipcRenderer.removeAllListeners('download-completed');
     ipcRenderer.removeAllListeners('download-error');
+  },
+
+  // License APIs
+  getHwid: () => ipcRenderer.invoke('get-hwid'),
+  checkLicense: () => ipcRenderer.invoke('check-license'),
+  saveLicense: (data: any) => ipcRenderer.invoke('save-license', data),
+  deleteLicense: () => ipcRenderer.invoke('delete-license'),
+  getAppInfo: () => ipcRenderer.invoke('get-app-info'),
+  startTrial: () => ipcRenderer.invoke('start-trial'),
+  onLicenseRevoked: (callback: (event: any, ...args: any[]) => void) => {
+    ipcRenderer.on('license-revoked', callback);
+  },
+});
+
+// Also expose as window.electron for 100% compatibility with photo_invoice patterns
+contextBridge.exposeInMainWorld('electron', {
+  getHwid: () => ipcRenderer.invoke('get-hwid'),
+  checkLicense: () => ipcRenderer.invoke('check-license'),
+  saveLicense: (data: any) => ipcRenderer.invoke('save-license', data),
+  deleteLicense: () => ipcRenderer.invoke('delete-license'),
+  getAppInfo: () => ipcRenderer.invoke('get-app-info'),
+  startTrial: () => ipcRenderer.invoke('start-trial'),
+  onLicenseRevoked: (callback: (event: any, ...args: any[]) => void) => {
+    ipcRenderer.on('license-revoked', callback);
   },
 });

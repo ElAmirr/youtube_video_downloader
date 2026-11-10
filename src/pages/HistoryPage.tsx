@@ -1,5 +1,5 @@
 import { useAppStore } from '../store';
-import { Clock, FolderOpen, Trash2, Play } from 'lucide-react';
+import { Clock, FolderOpen, Trash2, Play, Scissors } from 'lucide-react';
 
 const HistoryPage = () => {
   const history = useAppStore((state) => state.history);
@@ -89,8 +89,14 @@ const HistoryPage = () => {
               <p className="text-xs font-mono text-slate-500 truncate" title={item.filePath}>
                 {item.filePath}
               </p>
-              <div className="flex items-center gap-3 text-xs text-slate-400 pt-1">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1">
                 <span>Downloaded {formatDate(item.date)}</span>
+                {item.section && (
+                  <span className="inline-flex items-center gap-1 font-mono bg-amber-950/60 border border-amber-800/50 px-2 py-0.5 rounded text-[11px] text-amber-300">
+                    <Scissors size={11} className="text-amber-400" />
+                    {item.section.start} – {item.section.end}
+                  </span>
+                )}
                 {item.format && (
                   <span className="font-mono bg-slate-800 px-2 py-0.5 rounded text-[11px] text-slate-300">
                     {item.format}
@@ -102,14 +108,14 @@ const HistoryPage = () => {
             <div className="flex items-center gap-2 self-end md:self-center">
               <button
                 onClick={() => handleOpenFile(item.filePath)}
-                className="p-2.5 text-slate-300 hover:text-indigo-400 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 transition-colors"
+                className="p-2.5 text-slate-300 hover:text-amber-400 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 transition-colors"
                 title="Play File"
               >
                 <Play size={18} />
               </button>
               <button
                 onClick={() => handleOpenFolder(item.filePath)}
-                className="p-2.5 text-slate-300 hover:text-indigo-400 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 transition-colors"
+                className="p-2.5 text-slate-300 hover:text-amber-400 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 transition-colors"
                 title="Open Containing Folder"
               >
                 <FolderOpen size={18} />
